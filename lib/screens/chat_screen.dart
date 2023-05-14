@@ -40,9 +40,14 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void messagesStream() async {
-    await for (var snapshot in _firestore.collection('messages').snapshots()) {
+    await for (var snapshot in _firestore
+        .collection("messages")
+        .orderBy('time', descending: false)
+        .snapshots()) {
       for (var message in snapshot.docs) {
+        print('init baş');
         print(message.data());
+        print('init son');
       }
     }
     print('mesajlar alındı');
@@ -56,8 +61,9 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
               icon: Icon(Icons.close),
               onPressed: () {
-                _auth.signOut();
-                Navigator.pop(context);
+                // _auth.signOut();
+                // Navigator.pop(context);
+                messagesStream();
               }),
         ],
         title: Text('⚡️Chat'),
@@ -111,7 +117,10 @@ class MessageStream extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: _firestore.collection('messages').snapshots(),
+        stream: _firestore
+            .collection("messages")
+            .orderBy('time', descending: false)
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final messages = snapshot.data!.docs.reversed;
