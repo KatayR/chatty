@@ -20,6 +20,11 @@ class _LoginScreenState extends State<LoginScreen> {
   bool loading = false;
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
