@@ -38,20 +38,19 @@ class _ChatScreenState extends State<ChatScreen> {
       print(e);
     }
   }
-
-  void messagesStream() async {
-    await for (var snapshot in _firestore
-        .collection("messages")
-        .orderBy('time', descending: true)
-        .snapshots()) {
-      for (var message in snapshot.docs) {
-        print('init baş');
-        print(message.data());
-        print('init son');
-      }
-    }
-    print('mesajlar alındı');
-  }
+  // void messagesStream() async {
+  //   await for (var snapshot in _firestore
+  //       .collection("messages")
+  //       .orderBy('time', descending: false)
+  //       .snapshots()) {
+  //     for (var message in snapshot.docs) {
+  //       print('init baş');
+  //       print(message.data());
+  //       print('init son');
+  //     }
+  //   }
+  //   print('mesajlar alındı');
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +92,12 @@ class _ChatScreenState extends State<ChatScreen> {
                     onPressed: () {
                       messagTextController.clear();
                       _firestore.collection('messages').add(
-                          {'text': messageText, 'sender': loggedInUser!.email});
+                        {
+                          'text': messageText,
+                          'sender': loggedInUser!.email,
+                          'time': FieldValue.serverTimestamp()
+                        },
+                      );
                       setState(() {});
                     },
                     child: Text(
@@ -119,7 +123,7 @@ class MessageStream extends StatelessWidget {
     return StreamBuilder(
         stream: _firestore
             .collection("messages")
-            .orderBy('time', descending: true)
+            .orderBy('time', descending: false)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
