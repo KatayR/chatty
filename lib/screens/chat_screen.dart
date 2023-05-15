@@ -42,7 +42,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void messagesStream() async {
     await for (var snapshot in _firestore
         .collection("messages")
-        .orderBy('time', descending: false)
+        .orderBy('time', descending: true)
         .snapshots()) {
       for (var message in snapshot.docs) {
         print('init baş');
@@ -61,9 +61,8 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
               icon: Icon(Icons.close),
               onPressed: () {
-                // _auth.signOut();
-                // Navigator.pop(context);
-                messagesStream();
+                _auth.signOut();
+                Navigator.pop(context);
               }),
         ],
         title: Text('⚡️Chat'),
@@ -95,6 +94,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       messagTextController.clear();
                       _firestore.collection('messages').add(
                           {'text': messageText, 'sender': loggedInUser!.email});
+                      setState(() {});
                     },
                     child: Text(
                       'Send',
@@ -119,13 +119,14 @@ class MessageStream extends StatelessWidget {
     return StreamBuilder(
         stream: _firestore
             .collection("messages")
-            .orderBy('time', descending: false)
+            .orderBy('time', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final messages = snapshot.data!.docs.reversed;
             List<MessageBuble> messageBubbles = [];
             for (var message in messages) {
+              print(message.data());
               final messageText = message.data()['text'];
               final messageSender = message.data()['sender'];
               final currentUser = loggedInUser!.email;
