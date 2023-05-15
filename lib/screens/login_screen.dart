@@ -4,6 +4,7 @@ import 'package:chatty/screens/chat_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:quickalert/quickalert.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String id = "login_screen";
@@ -86,11 +87,24 @@ class _LoginScreenState extends State<LoginScreen> {
                       if (user != null) {
                         Navigator.pushNamed(context, ChatScreen.id);
                       }
+                    } catch (error) {
+                      var parts = error.toString().split(']');
+                      QuickAlert.show(
+                          context: context,
+                          animType: QuickAlertAnimType.slideInDown,
+                          type: QuickAlertType.error,
+                          text: parts[1].trim() + "\nPlease try again",
+                          confirmBtnText: "Okay",
+                          onConfirmBtnTap: () {
+                            while (Navigator.canPop(context)) {
+                              // Navigator.canPop return true if can pop
+                              Navigator.pop(context);
+                            }
+                          });
+                    } finally {
                       setState(() {
                         loading = false;
                       });
-                    } catch (e) {
-                      print(e);
                     }
                   })
                 ],

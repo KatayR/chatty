@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:chatty/constants.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:quickalert/quickalert.dart';
 
 class RegistrationScreen extends StatefulWidget {
   static const String id = "registration_screen";
@@ -86,8 +87,24 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       setState(() {
                         loading = false;
                       });
-                    } catch (e) {
-                      print(e);
+                    } catch (error) {
+                      var parts = error.toString().split(']');
+                      QuickAlert.show(
+                          context: context,
+                          animType: QuickAlertAnimType.slideInDown,
+                          type: QuickAlertType.error,
+                          text: parts[1].trim() + "\nPlease try again",
+                          confirmBtnText: "Okay",
+                          onConfirmBtnTap: () {
+                            while (Navigator.canPop(context)) {
+                              // Navigator.canPop return true if can pop
+                              Navigator.pop(context);
+                            }
+                          });
+                    } finally {
+                      setState(() {
+                        loading = false;
+                      });
                     }
                   })
                 ],
